@@ -13,10 +13,25 @@ type State(grid : bool [,], shape : Shape, rng : Random) =
     member x.Grid = grid
     member x.Shape = shape
     member x.Random = rng
+    member x.ToString() =
+        let s = new System.Text.StringBuilder()
+        s.AppendLine() |> ignore
+        for i in 1..(x.Grid.GetLength 0) do
+            for j in 1..(x.Grid.GetLength 1) do
+                let isPiece =
+                    x.Shape.Coords
+                    |> List.contains (i-1, j-1)
+            
+                let ascii =
+                    if x.Grid.[i-1, j-1] then "#" elif isPiece then "O" else "."
+
+                s.Append(ascii) |> ignore
+            s.AppendLine() |> ignore
+        s.ToString()
 
 let r = new Random()
 
-let s = new State(Array2D.create 2 2 false, {Coords = [(1,1)]; BlockType = L}, r)
+let s = new State(Array2D.create 20 10 false, {Coords = [(0,1); (0,2); (1,1); (2,1)]; BlockType = L}, r)
 
 let checkDown (state : State) =
     let newCoords =
@@ -26,7 +41,7 @@ let checkDown (state : State) =
     let isClear =
         newCoords
         |> List.map (fun (r, c) -> state.Grid.[r, c])
-        |> List.forall id
+        |> List.forall not
 
     match isClear with
     | false -> None
@@ -51,4 +66,5 @@ let tick (state : State) : State =
 
         State(newGrid, newShape, state.Random)
 
-let print
+s
+|> tick

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fetris", "Fetris.fsproj", "{3953A3CB-7B31-42D2-8371-0222C7A18562}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fetrus", "Fetrus.fsproj", "{3953A3CB-7B31-42D2-8371-0222C7A18562}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fetrus.Test", "..\Fetrus.Test\Fetrus.Test.fsproj", "{BF8A27C8-1CA2-40DA-910F-452BBFC40BB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3953A3CB-7B31-42D2-8371-0222C7A18562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3953A3CB-7B31-42D2-8371-0222C7A18562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3953A3CB-7B31-42D2-8371-0222C7A18562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF8A27C8-1CA2-40DA-910F-452BBFC40BB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8A27C8-1CA2-40DA-910F-452BBFC40BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8A27C8-1CA2-40DA-910F-452BBFC40BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8A27C8-1CA2-40DA-910F-452BBFC40BB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

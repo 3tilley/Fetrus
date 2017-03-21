@@ -28,6 +28,31 @@ type State(grid : bool [,], shape : Shape, rng : Random) =
                 s.Append(ascii) |> ignore
             s.AppendLine() |> ignore
         s.ToString()
+    new(s : string) =
+        let strings =
+            s.Split([|"\n"; "\r\n"|], StringSplitOptions.RemoveEmptyEntries)
+            |> Array.map (fun i -> i.Trim())
+
+        let rows = strings.Length
+        let cols = strings.[0].Length
+
+        let lst = System.Collections.Generic.List()
+
+        let grid =
+            Array2D.init rows cols (fun r c ->
+                if strings.[r].Length <> cols then
+                    failwith "Input string jagged"
+                match strings.[r].[c] with
+                | '.' -> false
+                | '#' -> true
+                | 'O' ->
+                    lst.Add((r,c))
+                    false)
+        // TODO: Everything is initiated as a block. Horrid!!!!
+        let shape = { Coords = lst |> List.ofSeq; BlockType = L }
+        State(grid, shape, null)
+
+
 
 let r = new Random()
 

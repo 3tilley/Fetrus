@@ -9,13 +9,15 @@ type Shape = {
     BlockType : BlockType
 }
 
-type State(grid : bool [,], shape : Shape, rng : Random) =
+type State(grid : bool [,], shape : Shape, newBlockGenerator) =
     member x.Grid = grid
     member x.Shape = shape
-    member x.Random = rng
+    member x.Rows = grid.GetLength 0
+    member x.Cols = grid.GetLength 1
+    member x.BlockGenerator = newBlockGenerator
     member x.ToString() =
         let s = new System.Text.StringBuilder()
-        s.AppendLine() |> ignore
+        //s.AppendLine() |> ignore
         for i in 1..(x.Grid.GetLength 0) do
             for j in 1..(x.Grid.GetLength 1) do
                 let isPiece =
@@ -27,10 +29,10 @@ type State(grid : bool [,], shape : Shape, rng : Random) =
 
                 s.Append(ascii) |> ignore
             s.AppendLine() |> ignore
-        s.ToString()
-    new(s : string) =
+        s.ToString().Trim()
+    new(s : string, blockGen) =
         let strings =
-            s.Split([|"\n"; "\r\n"|], StringSplitOptions.RemoveEmptyEntries)
+            s.Split([|"\n"; "\r\n"; " "|], StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (fun i -> i.Trim())
 
         let rows = strings.Length
@@ -50,13 +52,7 @@ type State(grid : bool [,], shape : Shape, rng : Random) =
                     false)
         // TODO: Everything is initiated as a block. Horrid!!!!
         let shape = { Coords = lst |> List.ofSeq; BlockType = L }
-        State(grid, shape, null)
-
-
-
-let r = new Random()
-
-let s = new State(Array2D.create 20 10 false, {Coords = [(0,1); (0,2); (1,1); (2,1)]; BlockType = L}, r)
+        State(grid, shape, blockGen)
 
 let checkDown (state : State) =
     let newCoords =
@@ -72,24 +68,34 @@ let checkDown (state : State) =
     | false -> None
     | true -> Some(newCoords)
 
-let makeNewShape (state : State) =
-    let c = (state.Grid.GetLength(1) / 2) - 2
-    { Coords = [(0,c); (0, c+1); (1, c); (1, c+1)]; BlockType=Square }
-
 let tick (state : State) : State =
 
     match (checkDown state) with
     | Some cs ->
-        State(state.Grid, { Coords = cs; BlockType = state.Shape.BlockType }, state.Random)
+        State(state.Grid, { Coords = cs; BlockType = state.Shape.BlockType }, state.BlockGenerator)
     | None ->
         let newGrid = state.Grid |> Array2D.copy
         
         state.Shape.Coords
         |> List.iter (fun (r,c) -> newGrid.[r,c] <- true )
 
-        let newShape = makeNewShape state
+        let newShape = state.BlockGenerator state.Cols
 
-        State(newGrid, newShape, state.Random)
+        // This is to remove complete rows
+        let newRows =
+            [ for r in 0..(state.Rows-1) ->
+                [for c in 0..(state.Cols-1) -> newGrid.[r,c]] ]
+            |> List.filter (fun lst -> lst |> List.forall id |> not)
 
-s
-|> tick
+        let filteredGrid =
+            match newRows.Length with
+            | x when x = state.Rows -> newGrid
+            | y when y < state.Rows ->
+                let emptyRows =
+                    List.replicate (state.Rows - y) (List.replicate state.Cols false)
+                newRows
+                |> List.append emptyRows
+                |> array2D
+            | x ->
+                failwithf "Number of rows increased after filter %i to %i" state.Rows x
+        State(filteredGrid, newShape, state.BlockGenerator)

@@ -1,76 +1,138 @@
 ﻿namespace Fetrus.Test
 
-open NUnit.Framework
-open FsUnit
+module Model =
 
-open Model
+    open NUnit.Framework
+    open FsUnit
 
-[<TestFixture>]
-type Class1() = 
-    [<Test>]
-    member this.``First test`` () =
-        "F#" |> should equal "F#"
+    open Model
 
-    [<Test>]
-    member this.``Test basic tick`` () =
-        let grid =
-            [[false; false; false; false]
-             [false; false; false; false]
-             [false; false; false; false]
-             [false; false; false; false]
-             [false; false; false; false]
-             [false; false; false; false]]
-             |> array2D
+    let removeWhitespace (s : string) =
+        s.Trim()
+        |> String.filter (System.Char.IsSeparator >> not)
 
-        let shape = {Coords = [(0,0); (1,0); (0,1); (1,1)]; BlockType = L}
+    let constantBlockGen cols =
+        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square }
 
-        let state = State(grid, shape, null)
+    let constState s =
+        State(s, constantBlockGen)
 
-        let ticked = tick state
+    [<TestFixture>]
+    type Class1() = 
+        [<Test>]
+        member this.``First test`` () =
+            "F#" |> should equal "F#"
 
-        (ticked.ToString())
-        |> should equal """
-....
-OO..
-OO..
-....
-....
-....
-"""
+        [<Test>]
+        member this.``Test basic tick`` () =
+            let grid =
+                [[false; false; false; false]
+                 [false; false; false; false]
+                 [false; false; false; false]
+                 [false; false; false; false]
+                 [false; false; false; false]
+                 [false; false; false; false]]
+                 |> array2D
 
-    [<Test>]
-    member this.``Test read string state`` () =
+            let shape = {Coords = [(0,0); (1,0); (0,1); (1,1)]; BlockType = L}
+
+            let state = State(grid, shape, constantBlockGen)
+
+            let ticked = tick state
+
+            (ticked.ToString())
+            |> should equal ("""
+                            ....
+                            OO..
+                            OO..
+                            ....
+                            ....
+                            ....
+                            """ |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test read string state`` () =
         
-        let testStringState=
-            """
-....
-.OO.
-OO..
-....
-....
-....
-"""
+            let testStringState=
+                "....
+                .OO.
+                OO..
+                ....
+                ....
+                ...."
+                |> removeWhitespace
         
-        State(testStringState).ToString()
-        |> should equal testStringState
+            State(testStringState, constantBlockGen).ToString()
+            |> should equal testStringState
 
-    [<Test>]
-    member this.``Test L shape`` () =
-        """
-....
-.OO.
-OO..
-....
-....
-....
-"""     |> State
-        |> tick
-        |> fun s -> s.ToString()
-        |> should equal """
-....
-....
-.OO.
-OO..
-....
-....
-"""
+        [<Test>]
+        member this.``Test L shape`` () =
+            "....
+            .OO.
+            OO..
+            ....
+            ....
+            ...."
+            |> constState
+            |> tick
+            |> fun s -> s.ToString()
+            |> should equal ("....
+                            ....
+                            .OO.
+                            OO..
+                            ....
+                            ...." |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test fixed blocks`` () =
+            "....
+            .OO.
+            OO..
+            ....
+            ..##
+            ####"
+            |> constState
+            |> tick
+            |> fun s -> s.ToString()
+            |> should equal ("....
+                            ....
+                            .OO.
+                            OO..
+                            ..##
+                            ####" |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test blocks collide`` () =
+            "....
+            ....
+            ....
+            .OO.
+            OO#.
+            #.##"
+            |> constState
+            |> tick
+            |> fun s -> s.ToString()
+            |> should equal ("OO..
+                              OO..
+                              ....
+                              .##.
+                              ###.
+                              #.##" |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test rows destroy themselves`` () =
+            "....
+            ....
+            ....
+            .OO.
+            OO##
+            #.##"
+            |> constState
+            |> tick
+            |> fun s -> s.ToString()
+            |> should equal ("OO..
+                              OO..
+                              ....
+                              ....
+                              .##.
+                              #.##" |> removeWhitespace)

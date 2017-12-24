@@ -136,3 +136,39 @@ module Model =
                               ....
                               .##.
                               #.##" |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test basic move`` () =
+            "....
+            OO..
+            OO..
+            ....
+            ..##
+            #.##"
+            |> constState
+            |> fun s -> move s (Translate Right)
+            |> fun s -> s.ToString()
+            |> should equal ("....
+                              .OO.
+                              .OO.
+                              ....
+                              ..##
+                              #.##" |> removeWhitespace)
+
+        [<Test>]
+        member this.``Test move into wall`` () =
+            "....
+            OO..
+            OO..
+            ....
+            ..##
+            #.##"
+            |> constState
+            |> fun s -> move s (Translate Left)
+            |> fun s -> s.ToString()
+            |> should equal ("....
+                              OO..
+                              OO..
+                              ....
+                              ..##
+                              #.##" |> removeWhitespace)

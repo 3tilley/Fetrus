@@ -9,6 +9,12 @@ type Shape = {
     BlockType : BlockType
 }
 
+type Direction = | Left | Right | Down
+
+type Key =
+    | Translate of Direction
+    | Rotate // | Down
+
 type State(grid : bool [,], shape : Shape, newBlockGenerator) =
     member x.Grid = grid
     member x.Shape = shape
@@ -54,15 +60,26 @@ type State(grid : bool [,], shape : Shape, newBlockGenerator) =
         let shape = { Coords = lst |> List.ofSeq; BlockType = L }
         State(grid, shape, blockGen)
 
-let checkDown (state : State) =
+let checkDirection direction (state : State) =
+
+    let coordChecker =
+        match direction with
+        | Down -> fun (r, c) -> (r + 1, c)
+        | Left -> fun (r, c) -> (r, c - 1)
+        | Right -> fun (r, c) -> (r, c + 1)
+    
     let newCoords =
         state.Shape.Coords
-        |> List.map (fun (r, c) -> (r + 1, c))
+        |> List.map coordChecker
 
     let isClear =
         newCoords
-        |> List.map (fun (r, c) -> state.Grid.[r, c])
-        |> List.forall not
+        |> List.map (fun (r, c) ->
+            if ((r >= 0) && (c >= 0) && (r < state.Rows) && (c < state.Cols)) then
+                not state.Grid.[r, c]
+            else
+                false)
+        |> List.forall id
 
     match isClear with
     | false -> None
@@ -70,7 +87,7 @@ let checkDown (state : State) =
 
 let tick (state : State) : State =
 
-    match (checkDown state) with
+    match (checkDirection Down state) with
     | Some cs ->
         State(state.Grid, { Coords = cs; BlockType = state.Shape.BlockType }, state.BlockGenerator)
     | None ->
@@ -99,3 +116,18 @@ let tick (state : State) : State =
             | x ->
                 failwithf "Number of rows increased after filter %i to %i" state.Rows x
         State(filteredGrid, newShape, state.BlockGenerator)
+
+let move (state : State) (key : Key) =
+    
+    match key with
+    | Translate(d) ->
+        match (checkDirection d state) with
+        | Some(cs) ->
+            State(state.Grid, { Coords = cs; BlockType = state.Shape.BlockType }, state.BlockGenerator)
+        | None ->
+            state
+    | Rotate ->
+        failwith "Not supported"
+            
+
+

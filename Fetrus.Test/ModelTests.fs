@@ -12,16 +12,13 @@ module Model =
         |> String.filter (System.Char.IsSeparator >> not)
 
     let constantBlockGen cols =
-        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square }
+        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square; Origin = (0.5, 0.5) }
 
     let constState s =
         State(s, constantBlockGen)
 
     [<TestFixture>]
     type Class1() = 
-        [<Test>]
-        member this.``First test`` () =
-            "F#" |> should equal "F#"
 
         [<Test>]
         member this.``Test basic tick`` () =
@@ -34,7 +31,7 @@ module Model =
                  [false; false; false; false]]
                  |> array2D
 
-            let shape = {Coords = [(0,0); (1,0); (0,1); (1,1)]; BlockType = L}
+            let shape = {Coords = [(0,0); (1,0); (0,1); (1,1)]; BlockType = L; Origin = (0.5, 0.5)}
 
             let state = State(grid, shape, constantBlockGen)
 

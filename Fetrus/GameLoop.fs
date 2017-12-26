@@ -1,6 +1,7 @@
 ﻿module GameLoop
 
-let directions = [System.ConsoleKey.LeftArrow; System.ConsoleKey.DownArrow; System.ConsoleKey.RightArrow]
+let directions = [System.ConsoleKey.LeftArrow; System.ConsoleKey.DownArrow;
+                  System.ConsoleKey.RightArrow; System.ConsoleKey.UpArrow]
 
 let rec gameLoop state lastTick timeBetweenTicks lastRender timeBetweenRenders =
     
@@ -20,11 +21,11 @@ let rec gameLoop state lastTick timeBetweenTicks lastRender timeBetweenRenders =
     if System.Console.KeyAvailable then
         let k = System.Console.ReadKey(true)
         if directions |> List.contains k.Key then
-            let dir =
+            let action =
                 match k.Key with
-                | System.ConsoleKey.LeftArrow -> Model.Direction.Left
-                | System.ConsoleKey.RightArrow -> Model.Direction.Right
-                | System.ConsoleKey.DownArrow -> Model.Direction.Down
-                | _ -> failwith "Key unrecognised"
-            gameLoop (Model.move state (Model.Translate dir)) lastTick timeBetweenTicks lastRender timeBetweenRenders
+                | System.ConsoleKey.LeftArrow -> Model.Translate Model.Direction.Left
+                | System.ConsoleKey.RightArrow -> Model.Translate Model.Direction.Right
+                | System.ConsoleKey.DownArrow -> Model.Translate Model.Direction.Down
+                | System.ConsoleKey.UpArrow -> Model.Rotate Model.RotationType.Clockwise
+            gameLoop (Model.move state action) lastTick timeBetweenTicks lastRender timeBetweenRenders
     gameLoop state lastTick timeBetweenTicks lastRender timeBetweenRenders

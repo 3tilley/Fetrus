@@ -6,9 +6,11 @@ open Model
 let main argv =
     System.Console.CursorVisible <- false
     let constantBlockGen cols =
-        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square }
+        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square; Origin = (0.5, 0.5)}
 
-    let start = Model.State(Array2D.create 10 20 false, constantBlockGen 10, constantBlockGen)
+    let alt = ShapeGenerators.Alternator()
+
+    let start = Model.State(Array2D.create 20 10 false, constantBlockGen 10, alt.nextBlock)
     let now = System.DateTime.UtcNow
     let renderTime = System.TimeSpan.FromSeconds(1.0 / 10.0)
     let tickTime = System.TimeSpan.FromSeconds(1.0)

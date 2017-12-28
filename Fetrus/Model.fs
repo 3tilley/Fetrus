@@ -1,14 +1,7 @@
 ﻿module Model
 
 open System
-
-type BlockType = | L | Square
-
-type Shape = {
-    Coords : (int * int) list
-    BlockType : BlockType
-    Origin : double * double
-}
+open Tetronimoes
 
 type Direction = | Left | Right | Down
 type RotationType = | Clockwise | AntiClockwise
@@ -25,8 +18,8 @@ type State(grid : bool [,], shape : Shape, newBlockGenerator) =
     member x.BlockGenerator = newBlockGenerator
     member x.ToString() =
         let s = new System.Text.StringBuilder()
-        //s.AppendLine() |> ignore
-        for i in 1..(x.Grid.GetLength 0) do
+        // We don't display the grid rows where they spawn
+        for i in 3..((x.Grid.GetLength 0)) do
             for j in 1..(x.Grid.GetLength 1) do
                 let isPiece =
                     x.Shape.Coords
@@ -43,21 +36,24 @@ type State(grid : bool [,], shape : Shape, newBlockGenerator) =
             s.Split([|"\n"; "\r\n"; " "|], StringSplitOptions.RemoveEmptyEntries)
             |> Array.map (fun i -> i.Trim())
 
-        let rows = strings.Length
+        let rows = strings.Length + 2
         let cols = strings.[0].Length
 
         let lst = System.Collections.Generic.List()
 
         let grid =
             Array2D.init rows cols (fun r c ->
-                if strings.[r].Length <> cols then
-                    failwith "Input string jagged"
-                match strings.[r].[c] with
-                | '.' -> false
-                | '#' -> true
-                | 'O' ->
-                    lst.Add((r,c))
-                    false)
+                if r <= 1 then
+                    false
+                else
+                    if strings.[r-2].Length <> cols then
+                        failwith "Input string jagged"
+                    match strings.[r-2].[c] with
+                    | '.' -> false
+                    | '#' -> true
+                    | 'O' ->
+                        lst.Add((r,c))
+                        false)
         // TODO: Everything is initiated as a block. Horrid!!!!
         let cs = lst |> List.ofSeq
         let o = (cs |> List.averageBy (fst >> double), cs |> List.averageBy (snd >> double))

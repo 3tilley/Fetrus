@@ -6,13 +6,14 @@ module Model =
     open FsUnit
 
     open Model
+    open Tetronimoes
 
     let removeWhitespace (s : string) =
         s.Trim()
         |> String.filter (System.Char.IsSeparator >> not)
 
     let constantBlockGen cols =
-        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = Square; Origin = (0.5, 0.5) }
+        { Coords = [(0, 0); (0, 1); (1, 0); (1, 1)]; BlockType = O; Origin = (0.5, 0.5) }
 
     let constState s =
         State(s, constantBlockGen)

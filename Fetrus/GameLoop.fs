@@ -3,6 +3,8 @@
 let directions = [System.ConsoleKey.LeftArrow; System.ConsoleKey.DownArrow;
                   System.ConsoleKey.RightArrow; System.ConsoleKey.UpArrow]
 
+
+// TODO find out why this stack overflows
 let rec gameLoop state lastTick timeBetweenTicks lastRender timeBetweenRenders =
     
     let nextTick = lastTick + timeBetweenTicks

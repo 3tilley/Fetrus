@@ -59,6 +59,7 @@
     <Compile Include="Tetronimoes.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="ShapeGenerators.fs" />
+    <Compile Include="InputOutput.fs" />
     <Compile Include="GameLoop.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
